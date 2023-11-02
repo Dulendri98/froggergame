@@ -13,17 +13,33 @@ player = Player()
 game_is_on = True
 game_loop = 0
 
-cars = CarManager()
+cars = [CarManager()]
+
+scoreboard = Scoreboard()
+
+level = 1
 
 while game_is_on:
     game_loop += 1
     screen.listen()
     screen.onkey(player.move, "w")
     time.sleep(0.1)
-    player.finish_line()
+    if player.ycor() > 280:
+        level += 1
+        player.setpos(player.STARTING_POSITION)
+        scoreboard.update_score()
+        for i in range(len(cars)):
+            cars[i].speedup()
+
     screen.update()
 
     if 0 == game_loop % 6:
-        cars = CarManager()
+        cars.append(CarManager())
 
-    cars.move()
+    for i in range(len(cars)):
+        cars[i].set_speed(level)
+        cars[i].move()
+        if player.distance(cars[i]) < 20:
+            game_is_on = False
+
+print("Game Over")
